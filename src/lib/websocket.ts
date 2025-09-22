@@ -10,8 +10,11 @@ export interface ReceivedMessage {
 export interface WebSocketHook {
   messages: ReceivedMessage[];
   connectionStatus: 'connecting' | 'connected' | 'disconnected' | 'error';
+  isLoadingHistory: boolean;
   connect: () => void;
   disconnect: () => void;
+  deleteMessage: (messageId: number) => Promise<void>;
+  batchDeleteMessages: (messageIds: number[]) => Promise<{ deleted: number[]; failed: any[] }>;
 }
 
 export class GotifyWebSocket {

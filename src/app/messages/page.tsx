@@ -32,42 +32,47 @@ export default function MessagesPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-100 py-8">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Gotify Messages</h1>
-            <p className="text-gray-600">Send and receive notifications from your Gotify server</p>
+    <main className="h-screen bg-gray-50 flex flex-col">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.003 9.003 0 01-5.28-1.67l-3.72.72.72-3.72C2.03 14.29 3 11.26 3 8c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-right">
-              <p className="text-sm text-gray-600">Welcome, {user?.name}</p>
-              {user?.admin && (
-                <p className="text-xs text-blue-600">Administrator</p>
-              )}
-            </div>
-            <button
-              onClick={logout}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm"
-            >
-              Logout
-            </button>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">Gotify Chat</h1>
+            <p className="text-sm text-gray-500">Connected to {process.env.NEXT_PUBLIC_GOTIFY_URL}</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Send Message</h2>
-            <MessageForm />
+        <div className="flex items-center space-x-4">
+          <div className="text-right">
+            <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+            {user?.admin && (
+              <p className="text-xs text-blue-600">Administrator</p>
+            )}
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Live Messages</h2>
-            <MessageReceiver />
-          </div>
+          <button
+            onClick={logout}
+            className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-colors"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Messages Container */}
+        <div className="flex-1 overflow-hidden">
+          <MessageReceiver />
         </div>
 
-        <div className="text-center text-sm text-gray-500">
-          <p>Connected to: {process.env.NEXT_PUBLIC_GOTIFY_URL}</p>
+        {/* Message Input */}
+        <div className="border-t border-gray-200 bg-white p-4">
+          <MessageForm />
         </div>
       </div>
     </main>
