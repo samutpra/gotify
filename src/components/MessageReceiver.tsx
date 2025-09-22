@@ -6,17 +6,37 @@ import { useEffect, useRef, useState } from 'react';
 
 function ConnectionStatus({ status }: { status: string }) {
   const statusConfig = {
-    connecting: { color: 'text-yellow-600', bg: 'bg-yellow-100', text: 'Setting up connection...' },
-    connected: { color: 'text-green-600', bg: 'bg-green-100', text: 'Connected' },
-    disconnected: { color: 'text-gray-600', bg: 'bg-gray-100', text: 'Disconnected' },
-    error: { color: 'text-red-600', bg: 'bg-red-100', text: 'Connection Error' },
+    connecting: {
+      color: 'text-yellow-400',
+      bg: 'bg-gray-800 border border-yellow-500/30',
+      text: 'Connecting...',
+      dot: 'bg-yellow-500'
+    },
+    connected: {
+      color: 'text-green-400',
+      bg: 'bg-gray-800 border border-green-500/30',
+      text: 'Connected',
+      dot: 'bg-green-500'
+    },
+    disconnected: {
+      color: 'text-gray-400',
+      bg: 'bg-gray-800 border border-gray-500/30',
+      text: 'Disconnected',
+      dot: 'bg-gray-500'
+    },
+    error: {
+      color: 'text-red-400',
+      bg: 'bg-gray-800 border border-red-500/30',
+      text: 'Error',
+      dot: 'bg-red-500'
+    },
   };
 
   const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.error;
 
   return (
-    <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.color} ${config.bg}`}>
-      <div className={`w-2 h-2 rounded-full mr-2 ${status === 'connected' ? 'bg-green-500' : status === 'connecting' ? 'bg-yellow-500 animate-pulse' : status === 'error' ? 'bg-red-500' : 'bg-gray-500'}`} />
+    <div className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${config.color} ${config.bg}`}>
+      <div className={`w-2 h-2 rounded-full mr-2 ${config.dot} ${status === 'connecting' ? 'animate-pulse' : ''}`} />
       {config.text}
     </div>
   );
@@ -45,19 +65,22 @@ function MessageItem({
 
 
   return (
-    <div className={`flex items-start space-x-3 p-4 hover:bg-gray-50 transition-colors ${isSelected ? 'bg-blue-50 border-l-4 border-blue-500' : ''}`}>
+    <div className={`relative flex items-start space-x-3 p-4 hover:bg-gray-800/50 transition-colors duration-200 ${isSelected ? 'bg-gray-800/70 border-l-2 border-red-500' : ''} my-1 border-b border-gray-800/50`}>
+      {/* Animated red line for each message */}
+      <div className="absolute left-0 top-0 w-px h-full bg-gradient-to-b from-transparent via-red-500/30 to-transparent animate-pulse delay-300"></div>
+
       {/* Selection Checkbox or Avatar */}
       {selectionMode ? (
-        <div className="flex items-center justify-center w-8 h-8 flex-shrink-0">
+        <div className="flex items-center justify-center w-8 h-8 flex-shrink-0 mt-1">
           <input
             type="checkbox"
             checked={isSelected}
             onChange={(e) => onSelect(message.id, e.target.checked)}
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            className="w-4 h-4 text-red-500 bg-gray-800 border-red-500/50 rounded focus:ring-red-500 focus:ring-2"
           />
         </div>
       ) : (
-        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-800 rounded-full flex items-center justify-center flex-shrink-0 mt-1 border border-red-500/50">
           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5l-5-5h5v-12" />
           </svg>
@@ -66,22 +89,25 @@ function MessageItem({
 
       {/* Message Content */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-center space-x-2 mb-1">
-          <span className="font-semibold text-gray-900 text-sm">Gotify Server</span>
+        <div className="flex items-center space-x-2 mb-2">
+          <span className="font-medium text-gray-200 text-sm">Gotify Server</span>
           <span className="text-xs text-gray-500">
             {formatTime(message.date)}
           </span>
         </div>
 
-        {/* Message Bubble */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 group relative">
-          <p className="text-gray-700 text-sm whitespace-pre-wrap leading-relaxed pr-8">{message.message}</p>
+        {/* Message Bubble - Dark with Red Accent */}
+        <div className="relative bg-gray-800 border-l-4 border-red-500 p-3 group hover:bg-gray-700/80 transition-colors duration-200 rounded-r-md">
+          {/* Animated red line inside message */}
+          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-red-500/50 to-transparent animate-pulse"></div>
+
+          <p className="text-gray-200 text-sm whitespace-pre-wrap leading-relaxed pr-8">{message.message}</p>
 
           {/* Delete Button - only show when not in selection mode */}
           {!selectionMode && (
             <button
               onClick={() => onDelete(message.id)}
-              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 rounded-full hover:bg-red-100 text-red-500 hover:text-red-700"
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-1 rounded hover:bg-red-900/50 text-red-400 hover:text-red-300"
               title="Delete message"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,19 +206,22 @@ export default function MessageReceiver() {
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-black">
       {/* Chat Header */}
-      <div className="flex justify-between items-center p-4 border-b border-gray-200 bg-white">
-        <div className="flex items-center space-x-2">
+      <div className="relative flex justify-between items-center p-6 border-b border-red-500/30 bg-gray-900">
+        {/* Animated red line under header */}
+        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse"></div>
+
+        <div className="flex items-center space-x-4">
           <ConnectionStatus status={connectionStatus} />
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-200 font-medium bg-gray-800 border border-red-500/30 px-3 py-1 rounded-md">
             {messages.length} message{messages.length !== 1 ? 's' : ''}
           </span>
           {isLoadingHistory && (
-            <span className="text-xs text-blue-600">Loading...</span>
+            <span className="text-xs text-yellow-400 bg-gray-800 border border-yellow-500/30 px-3 py-1 rounded-md animate-pulse">Loading...</span>
           )}
           {selectionMode && (
-            <span className="text-xs text-blue-600">
+            <span className="text-xs text-red-400 bg-gray-800 border border-red-500/30 px-3 py-1 rounded-md">
               {selectedMessages.size} selected
             </span>
           )}
@@ -205,7 +234,7 @@ export default function MessageReceiver() {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={handleSelectAll}
-                    className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                    className="px-3 py-1 text-xs bg-gray-800 text-red-400 rounded hover:bg-gray-700 transition-colors font-medium border border-red-500/30"
                   >
                     {selectedMessages.size === messages.length ? 'Deselect All' : 'Select All'}
                   </button>
@@ -213,11 +242,11 @@ export default function MessageReceiver() {
                     <button
                       onClick={handleBatchDelete}
                       disabled={isDeleting}
-                      className="px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50 transition-colors flex items-center space-x-1"
+                      className="px-3 py-1 text-xs bg-red-900/50 text-red-400 rounded hover:bg-red-800/50 disabled:opacity-50 transition-colors font-medium flex items-center space-x-1 border border-red-500/30"
                     >
                       {isDeleting ? (
                         <>
-                          <div className="w-3 h-3 border border-red-600 border-t-transparent rounded-full animate-spin"></div>
+                          <div className="w-3 h-3 border border-red-400 border-t-transparent rounded-full animate-spin"></div>
                           <span>Deleting...</span>
                         </>
                       ) : (
@@ -232,7 +261,7 @@ export default function MessageReceiver() {
                   )}
                   <button
                     onClick={toggleSelectionMode}
-                    className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                    className="px-3 py-1 text-xs bg-gray-800 text-gray-400 rounded hover:bg-gray-700 transition-colors font-medium border border-gray-500/30"
                   >
                     Cancel
                   </button>
@@ -240,7 +269,7 @@ export default function MessageReceiver() {
               ) : (
                 <button
                   onClick={toggleSelectionMode}
-                  className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors flex items-center space-x-1"
+                  className="px-3 py-1 text-xs bg-gray-800 text-red-400 rounded hover:bg-gray-700 transition-colors font-medium flex items-center space-x-1 border border-red-500/30"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -255,7 +284,7 @@ export default function MessageReceiver() {
           {connectionStatus === 'disconnected' && (
             <button
               onClick={connect}
-              className="px-3 py-1 bg-green-100 text-green-700 rounded-md hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm transition-colors"
+              className="px-4 py-2 bg-green-900/50 text-green-400 rounded hover:bg-green-800/50 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm transition-colors font-medium border border-green-500/30"
             >
               Connect
             </button>
@@ -263,7 +292,7 @@ export default function MessageReceiver() {
           {connectionStatus === 'connected' && (
             <button
               onClick={disconnect}
-              className="px-3 py-1 bg-red-100 text-red-700 rounded-md hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-colors"
+              className="px-4 py-2 bg-red-900/50 text-red-400 rounded hover:bg-red-800/50 focus:outline-none focus:ring-2 focus:ring-red-500 text-sm transition-colors font-medium border border-red-500/30"
             >
               Disconnect
             </button>
@@ -272,22 +301,28 @@ export default function MessageReceiver() {
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div className="relative flex-1 overflow-y-auto bg-black">
+        {/* Animated red lines in messages area */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent animate-pulse delay-500"></div>
+          <div className="absolute top-3/4 left-0 w-full h-px bg-gradient-to-r from-transparent via-red-500/20 to-transparent animate-pulse delay-1500"></div>
+        </div>
+
         {isLoadingHistory ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
-            <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-lg font-medium mb-2">Loading message history...</p>
-            <p className="text-sm text-center">Fetching your previous messages</p>
+          <div className="flex flex-col items-center justify-center h-full text-gray-200 p-8">
+            <div className="w-12 h-12 border-4 border-gray-700 border-t-red-500 rounded-full animate-spin mb-6"></div>
+            <p className="text-xl font-medium mb-3 text-gray-200">Loading message history...</p>
+            <p className="text-sm text-center text-gray-500 bg-gray-800 border border-red-500/30 px-4 py-2 rounded-md">Fetching your previous messages</p>
           </div>
         ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500 p-8">
-            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-              <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="flex flex-col items-center justify-center h-full text-gray-200 p-8">
+            <div className="w-20 h-20 bg-gray-800 border border-red-500/30 rounded-full flex items-center justify-center mb-6">
+              <svg className="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.003 9.003 0 01-5.28-1.67l-3.72.72.72-3.72C2.03 14.29 3 11.26 3 8c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <p className="text-lg font-medium mb-2">No messages yet</p>
-            <p className="text-sm text-center">
+            <p className="text-xl font-medium mb-3 text-gray-200">No messages yet</p>
+            <p className="text-sm text-center text-gray-500 bg-gray-800 border border-red-500/30 px-6 py-3 rounded-md max-w-md">
               {connectionStatus === 'disconnected'
                 ? 'Click connect to start receiving live messages'
                 : connectionStatus === 'connecting'
@@ -299,7 +334,7 @@ export default function MessageReceiver() {
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="space-y-1 p-2">
             {messages.map((message) => (
               <MessageItem
                 key={`${message.id}-${message.date}`}
